@@ -16,7 +16,7 @@ class Position :
         self.x = x
      def setY(self, y) :
         self.y = y
-        def clone(self):
+     def clone(self):
             return Position(self.x, self.y)
 
 
@@ -24,7 +24,7 @@ class Position :
 
 class CaseVide:
     Position:Position
-    taquin:Taquin
+    taquin:"Taquin"
     value:int
     def __init__(self, position, taquin) :
         self.position = position
@@ -134,7 +134,7 @@ class Case(CaseVide):
 
 
 class listePriorite:
-    def __init__(self,taquinFinal:'Taquin',poids:list(int)):
+    def __init__(self,taquinFinal:'Taquin',poids):
         self.liste = []
         self.taquinFinal=taquinFinal
         self.poids=poids
@@ -161,16 +161,20 @@ class listePriorite:
 
 class Taquin:
     size :int
-    cases:list(list(CaseVide))
-    CaseVide:CaseVide
+    cases:list()
+    caseVide:CaseVide
     def __init__(self, size,parent:'Taquin') :
-        z=0
+        
         self.size = size
         self.parent = parent
-        for i in range(size):
+        self.cases = []
+
+    def remplir(self):
+        z=0
+        for i in range(self.size):
             self.cases.append([])
-            for j in range(size):
-                if(j==size-1 and i==size-1):
+            for j in range(self.size):
+                if(j==self.size-1 and i==self.size-1):
                     caseVide=CaseVide(Position(i, j), self)
                     self.cases[i].append(caseVide)
                     z+=1
@@ -178,16 +182,15 @@ class Taquin:
                 self.cases[i].append(Case(z,Position(i, j), self))
                 z+=1
    
-    def __init__(self, taquin:"Taquin"):
-        self.size = taquin.size
-        self.parent = taquin.parent
+    def clone(self ):
+        taquin=Taquin(self.size,self.parent)
 
         for i in range(self.size):
-            self.cases.append([])
+            taquin.cases.append([])
             for j in range(self.size):
-                self.cases[i].append(taquin.cases[i][j].clone())
-                if self.cases[i][j].getValue() == 0:
-                    self.CaseVide = self.cases[i][j]
+                taquin.cases[i].append(self.cases[i][j].clone())
+                if taquin.cases[i][j].getValue() == None:
+                    taquin.caseVide = taquin.cases[i][j]
         
 
     def getSize(self) :
@@ -204,14 +207,16 @@ class Taquin:
     def setCase(self, x, y, case) :
         self.cases[x][y] = case
     def getCaseVide(self) :
-        return self.CaseVide
+        return self.caseVide
     def getParent(self) :
         return self.parent
     def cout(self):
+        if self.parent == None:
+            return 0
         return self.parent.cout()+1#fonction g
     
     def move(self, direction) :
-        return self.CaseVide.move(direction)
+        return self.caseVide.move(direction)
     
     def isSolved(self,taquinFinal:'Taquin') :
         for i in range(self.size):
@@ -229,8 +234,7 @@ class Taquin:
 
         return res
     
-    def clone(self) :
-        return Taquin(self)
+    
     
     def distmanhattan(self, taquinFinal:'Taquin',i:int,j:int) :
         
@@ -246,16 +250,16 @@ class Taquin:
         for i in range(nbMoves):
             self.move(random.choice(["N", "S", "E", "W"]))
 
-    def heuristiquePondere(self,taquinFinal:'Taquin',poids:list(int)):
+    def heuristiquePondere(self,taquinFinal:'Taquin',poids:list()):
         res=0
         for i in range(self.size):
             for j in range(self.size):
                 res+=self.distmanhattan(taquinFinal,i,j)*poids[self.cases[i][j].getValue()]
         return res
-    def fnctEval(self,taquinFinal:'Taquin',poids:list(int)):
+    def fnctEval(self,taquinFinal:'Taquin',poids:list()):
         return self.heuristiquePondere(taquinFinal,poids)+self.cout()
 
-    def getVoisins(self,taquinFinal:'Taquin',poids:list(int))->list('Taquin'):
+    def getVoisins(self,taquinFinal:'Taquin',poids:list())->list('Taquin'):
         voisins:list(Taquin)=[]
         for direction in ["N", "S", "E", "W"]:
             if self.move(direction):
@@ -273,9 +277,9 @@ class Taquin:
             return "E"
         return None
    
-    def compareTo(self, taquin:'Taquin',taquinFinal:'Taquin',poids:list(int)) :
+    def compareTo(self, taquin:'Taquin',taquinFinal:'Taquin',poids:list()) :
         return self.fnctEval(taquinFinal,poids) - taquin.fnctEval(taquinFinal,poids)
-    def solve(self, taquinFinal:'Taquin',poids:list(int)) :
+    def solve(self, taquinFinal:'Taquin',poids:list()) :
         openList = listePriorite()
         closedList:list(Taquin) = []
         openList.insert(self, self.fnctEval(taquinFinal,poids))
