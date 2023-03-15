@@ -55,9 +55,9 @@ class CaseVide:
         if direction == "N" :
             if self.position.getY() > 0 :
                
-                caseADescendre=self.taquin.getCase(self.position.getX(), self.position.getY() + 1)
+                caseADescendre=self.taquin.getCase(self.position.getX(), self.position.getY() - 1)
                 caseADescendre.setPositionY(self.position.getY())
-                self.position.setY(self.position.getY() + 1)
+                self.position.setY(self.position.getY() - 1)
                 self.taquin.setCase(self.position.getX(), self.position.getY(), self)
                 self.taquin.setCase(caseADescendre.getPositionX(), caseADescendre.getPositionY(), caseADescendre)
                 return True
@@ -65,9 +65,9 @@ class CaseVide:
     def moveSouth(self, direction)->bool:
         if direction == "S" :
             if self.position.getY() < self.taquin.getSize() - 1 :
-                caseARemonter=self.taquin.getCase(self.position.getX(), self.position.getY() - 1)
+                caseARemonter=self.taquin.getCase(self.position.getX(), self.position.getY() + 1)
                 caseARemonter.setPositionY(self.position.getY())
-                self.position.setY(self.position.getY() - 1)
+                self.position.setY(self.position.getY() + 1)
                 self.taquin.setCase(self.position.getX(), self.position.getY(), self)
                 self.taquin.setCase(caseARemonter.getPositionX(), caseARemonter.getPositionY(), caseARemonter)
                 return True
@@ -92,7 +92,6 @@ class CaseVide:
                 self.taquin.setCase(caseAGauche.getPositionX(), caseAGauche.getPositionY(), caseAGauche)
                 return True
         return False
-
 
 
 
@@ -143,7 +142,7 @@ class listePriorite:
             self.liste.append(element)
         else:
             for i in range(len(self.liste)):
-                if comparator(self.liste[i],self.taquinFinal,self.poids):#element.comparator() - self.liste[i].comparator()<0
+                if comparator(self.liste[i],self.taquinFinal,self.poids)<0:#element.comparator() - self.liste[i].comparator()<0
                     self.liste.insert(i, element)
                     break
                 elif i == len(self.liste) - 1:
@@ -175,8 +174,8 @@ class Taquin:
             self.cases.append([])
             for j in range(self.size):
                 if(j==self.size-1 and i==self.size-1):
-                    caseVide=CaseVide(Position(i, j), self)
-                    self.cases[i].append(caseVide)
+                    self.caseVide=CaseVide(Position(i, j), self)
+                    self.cases[i].append(self.caseVide)
                     z+=1
                     break
                 self.cases[i].append(Case(z,Position(i, j), self))
@@ -188,9 +187,11 @@ class Taquin:
         for i in range(self.size):
             taquin.cases.append([])
             for j in range(self.size):
-                taquin.cases[i].append(self.cases[i][j].clone())
+                C=self.cases[i][j].clone()
+                taquin.cases[i].append(C)
                 if taquin.cases[i][j].getValue() == None:
                     taquin.caseVide = taquin.cases[i][j]
+        return taquin
         
 
     def getSize(self) :
@@ -198,7 +199,7 @@ class Taquin:
     
     def getCase(self, x, y) :
         return self.cases[x][y]
-    def getCase(self,val):
+    def getCasebV(self,val):
         for i in range(self.size):
             for j in range(self.size):
                 if self.cases[i][j].getValue() == val:
@@ -216,7 +217,15 @@ class Taquin:
         return self.parent.cout()+1#fonction g
     
     def move(self, direction) :
-        return self.caseVide.move(direction)
+        if (direction == "N"):
+            return self.caseVide.moveNorth(direction)
+        elif (direction == "S"):
+            return self.caseVide.moveSouth(direction)
+        elif (direction == "E"):
+            return self.caseVide.moveEast(direction)
+        elif (direction == "W"):
+            return self.caseVide.moveWest(direction)
+        return False
     
     def isSolved(self,taquinFinal:'Taquin') :
         for i in range(self.size):
@@ -238,10 +247,10 @@ class Taquin:
     
     def distmanhattan(self, taquinFinal:'Taquin',i:int,j:int) :
         
-        c=self.cases[i][j]
+        c :CaseVide=self.cases[i][j]
         if c.getValue() != None:
-                    cFinal=taquinFinal.getCase(c.getValue())
-                    return abs(c.getPosition().getX() - cFinal.getPosition().getX()) + abs(c.getPosition().getY() - cFinal.getPosition().getY())
+                    cFinal=taquinFinal.getCasebV(c.getValue())
+                    return abs(c.getPositionX()- cFinal.getPositionX()) + abs(c.getPositionY() - cFinal.getPositionY())
         return 0#A revoir pour la case vide
    
    
@@ -254,13 +263,15 @@ class Taquin:
         res=0
         for i in range(self.size):
             for j in range(self.size):
-                res+=self.distmanhattan(taquinFinal,i,j)*poids[self.cases[i][j].getValue()]
+                if(self.cases[i][j].getValue() != None):
+                 res+=self.distmanhattan(taquinFinal,i,j)*poids[self.cases[i][j].getValue()]
         return res
     def fnctEval(self,taquinFinal:'Taquin',poids:list()):
         return self.heuristiquePondere(taquinFinal,poids)+self.cout()
 
-    def getVoisins(self,taquinFinal:'Taquin',poids:list())->list('Taquin'):
-        voisins:list(Taquin)=[]
+    def getVoisins(self,taquinFinal:'Taquin',poids:list()):
+        voisins:list(Taquin)
+        voisins=[]
         for direction in ["N", "S", "E", "W"]:
             if self.move(direction):
                 voisins.append((self.clone(),self.fnctEval(taquinFinal,poids)))
@@ -280,7 +291,7 @@ class Taquin:
     def compareTo(self, taquin:'Taquin',taquinFinal:'Taquin',poids:list()) :
         return self.fnctEval(taquinFinal,poids) - taquin.fnctEval(taquinFinal,poids)
     def solve(self, taquinFinal:'Taquin',poids:list()) :
-        openList = listePriorite()
+        openList = listePriorite(taquinFinal,poids)
         closedList:list(Taquin) = []
         openList.insert(self, self.fnctEval(taquinFinal,poids))
         while not openList.isEmpty():
@@ -288,8 +299,12 @@ class Taquin:
             if current.isSolved(taquinFinal):
                 return current
             closedList.append(current)
-            for voisin in current.getVoisins(taquinFinal,poids):
-                if voisin[0] not in closedList:
-                    openList.insert(voisin[0],voisin.compareTo)
+            for direction in ["N", "S", "E", "W"]:
+                if self.move(direction):
+                    v=self.clone()
+                    self.move(self.getOppositeDirection(direction))
+                    if v not in closedList:
+                        openList.insert(v,v.compareTo)
+                        print("tryiing")
         return None
 
