@@ -46,7 +46,7 @@ class Taquin:
             deplacements.append('Est')
         return deplacements
     
-    def afficherH(self):
+    def afficherG(self):
         print(self.g)
     
     def expand(self):
@@ -58,12 +58,15 @@ class Taquin:
             taquin = Taquin(nouvel_etat)
             taquin.deplacer(direction)
             taquin.afficher()
-            taquin.afficherH()
+            taquin.afficherG()
             taquins_expands.append(taquin)
             
         return taquins_expands        
-        
-
+    def manhattan(self):
+        #for case in self.etat:    
+        pass        
+    def heuristtique():
+        pass
 
 
 
