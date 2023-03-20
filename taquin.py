@@ -29,6 +29,7 @@ class CaseVide:
     def __init__(self, position, taquin) :
         self.position = position
         self.taquin = taquin
+        self.value =None
 
 
     def getPositionX(self) :
@@ -94,7 +95,8 @@ class CaseVide:
         return False
 
 
-
+    def __eq__(self, __o: object) -> bool:
+        return self.position.__eq__(__o.position)and self.value.__eq__(__o.value)
 
 
 class Case(CaseVide):
@@ -125,7 +127,8 @@ class Case(CaseVide):
          return False
     def clone(self):
         return Case(self.value, self.position.clone(), self.taquin)
-
+    def __eq__(self, __o: object) -> bool:
+        return super().__eq__(__o)
 
 
 
@@ -142,6 +145,7 @@ class listePriorite:
             self.liste.append(element)
         else:
             for i in range(len(self.liste)):
+               
                 if comparator(self.liste[i],self.taquinFinal,self.poids)<0:#element.comparator() - self.liste[i].comparator()<0
                     self.liste.insert(i, element)
                     break
@@ -154,7 +158,7 @@ class listePriorite:
         return len(self.liste) == 0
 
 
-
+    
 
 
 
@@ -211,21 +215,38 @@ class Taquin:
         return self.caseVide
     def getParent(self) :
         return self.parent
+    def setParent(self, parent) :
+        self.parent = parent
     def cout(self):
         if self.parent == None:
             return 0
         return self.parent.cout()+1#fonction g
     
     def move(self, direction) :
+        moved=self.clone()
+        
         if (direction == "N"):
-            return self.caseVide.moveNorth(direction)
-        elif (direction == "S"):
-            return self.caseVide.moveSouth(direction)
-        elif (direction == "E"):
-            return self.caseVide.moveEast(direction)
-        elif (direction == "W"):
-            return self.caseVide.moveWest(direction)
-        return False
+            if moved.caseVide.moveNorth(direction):
+                moved.setParent(self)
+                return moved
+        if (direction == "S"):
+            if moved.caseVide.moveSouth(direction):
+                moved.setParent(self)
+                return moved
+        if (direction == "E"):
+            if moved.caseVide.moveEast(direction):
+                moved.setParent(self)
+                return moved
+        if (direction == "W"):
+            if moved.caseVide.moveWest(direction):
+                moved.setParent(self)
+                return moved
+            
+        return None
+
+
+
+      
     
     def isSolved(self,taquinFinal:'Taquin') :
         for i in range(self.size):
@@ -295,16 +316,32 @@ class Taquin:
         closedList:list(Taquin) = []
         openList.insert(self, self.fnctEval(taquinFinal,poids))
         while not openList.isEmpty():
+            print("ll")
             current:Taquin = openList.pop()
             if current.isSolved(taquinFinal):
                 return current
-            closedList.append(current)
+            
             for direction in ["N", "S", "E", "W"]:
-                if self.move(direction):
-                    v=self.clone()
-                    self.move(self.getOppositeDirection(direction))
-                    if v not in closedList:
+                v=current.move(direction)
+                b=True
+                for c in closedList:
+                    b=b and v.eg(c)
+                if b:
                         openList.insert(v,v.compareTo)
-                        print("tryiing")
+                        print(v.cout())
+            closedList.append(current)
         return None
+    
+    
 
+    def eg(self, __o: 'Taquin') -> bool:
+        
+            if self.size==__o.size:
+                
+                for i in range (self.size):
+                    for j in range (self.size):
+                        if not self.getCase(i,j).getValue()==__o.getCase(i,j).getValue():
+                            return False
+                
+                return True
+            return False
