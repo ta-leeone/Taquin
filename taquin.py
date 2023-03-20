@@ -1,3 +1,23 @@
+
+"""
+class Case :
+     x :int 
+     y :int 
+     def __init__(self, x, y) :
+        self.x = x
+        self.y = y
+
+     def getX(self) :
+        return self.x
+     def getY(self) :
+        return self.y
+     def setX(self, x) :
+        self.x = x
+     def setY(self, y) :
+        self.y = y
+     def clone(self):
+            return Case(self.x, self.y)
+"""
 class Taquin:
     def __init__(self, etat):
         self.etat = etat
@@ -8,6 +28,54 @@ class Taquin:
         for i in range(0, 9,3):
             print(self.etat[i:i+3])
         print("\n")
+    
+    def attribuerPosition(self,i):
+        index = self.etat.index(i)
+        
+        if index==0:
+            posX = 0
+            posY = 0
+            print(posX)
+            return posX and posY
+        
+        if index==1:
+            posX=0
+            posY=1
+            return posX and posY    
+        if index==2:
+            posX=0
+            posY=2
+            return posX and posY
+        if index==3:
+            posX = 1
+            posY = 0
+            print(posX)
+            return posX and posY
+        if index==4:
+            posX = 1
+            posY = 1
+            print(posX)
+            return posX and posY
+        if index==5:
+            posX = 1
+            posY = 2
+            print(posX)
+            return posX and posY
+        if index==6:
+            posX = 2
+            posY = 0
+            print(posX)
+            return posX and posY
+        if index==7:
+            posX = 2
+            posY = 1
+            print(posX)
+            return posX and posY
+        if index==8:
+            posX = 2
+            posY = 2
+            print(posX)
+            return posX and posY
     
     def deplacer(self, direction):
         index = self.etat.index(0)
@@ -62,8 +130,13 @@ class Taquin:
             taquins_expands.append(taquin)
             
         return taquins_expands        
-    def manhattan(self):
-        #for case in self.etat:    
+    def manhattan(self,taquinFinal:"Taquin",i):
+        for elt in taquinFinal.etat:
+            if elt==self.etat[i]:
+                return 
+
+
+           
         pass        
     def heuristtique():
         pass
@@ -74,3 +147,4 @@ etat_initial = [1, 2, 3, 4, 5, 6, 7, 8, 0]
 t = Taquin(etat_initial)
 
 t.expand()
+t.attribuerPosition(8)
