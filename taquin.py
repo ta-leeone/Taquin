@@ -50,49 +50,54 @@ class CaseVide:
         return None
     def setValue(self, value) :
         pass
-    def clone(self):
-        return CaseVide(self.position, self.taquin)
-    def moveNorth(self, direction)->bool:
-        if direction == "N" :
-            if self.position.getY() > 0 :
-               
-                caseADescendre=self.taquin.getCase(self.position.getX(), self.position.getY() - 1)
-                caseADescendre.setPositionY(self.position.getY())
-                self.position.setY(self.position.getY() - 1)
-                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
-                self.taquin.setCase(caseADescendre.getPositionX(), caseADescendre.getPositionY(), caseADescendre)
-                return True
-        return False
-    def moveSouth(self, direction)->bool:
-        if direction == "S" :
-            if self.position.getY() < self.taquin.getSize() - 1 :
-                caseARemonter=self.taquin.getCase(self.position.getX(), self.position.getY() + 1)
-                caseARemonter.setPositionY(self.position.getY())
-                self.position.setY(self.position.getY() + 1)
-                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
-                self.taquin.setCase(caseARemonter.getPositionX(), caseARemonter.getPositionY(), caseARemonter)
-                return True
-        return False
-    def moveEast(self, direction)->bool:
-        if direction == "E" :
-            if self.position.getX() < self.taquin.getSize() - 1 :
-                caseADroite=self.taquin.getCase(self.position.getX() + 1, self.position.getY())
-                caseADroite.setPositionX(self.position.getX())
-                self.position.setX(self.position.getX() + 1)
-                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
-                self.taquin.setCase(caseADroite.getPositionX(), caseADroite.getPositionY(), caseADroite)
-                return True
-        return False
-    def moveWest(self, direction)->bool:
-        if direction == "W" :
+    def clone(self,taq):
+        return CaseVide(self.position, taq)
+    def moveNorth(self)->bool:
             if self.position.getX() > 0 :
-                caseAGauche=self.taquin.getCase(self.position.getX() - 1, self.position.getY())
-                caseAGauche.setPositionX(self.position.getX())
+                descendre=self.taquin.getCase(self.position.getX() - 1, self.position.getY())
+                descendre.setPositionX(self.position.getX())
                 self.position.setX(self.position.getX() - 1)
                 self.taquin.setCase(self.position.getX(), self.position.getY(), self)
-                self.taquin.setCase(caseAGauche.getPositionX(), caseAGauche.getPositionY(), caseAGauche)
+                self.taquin.setCase(descendre.getPositionX(), descendre.getPositionY(), descendre)
                 return True
-        return False
+            else:
+                return False
+    def moveSouth(self)->bool:
+        
+           
+            
+              if self.position.getX() < self.taquin.getSize() - 1 :
+                monter=self.taquin.getCase(self.position.getX() + 1, self.position.getY())
+                monter.setPositionX(self.position.getX())
+                self.position.setX(self.position.getX() + 1)
+                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
+                self.taquin.setCase(monter.getPositionX(), monter.getPositionY(), monter)
+                return True
+              else:
+                return False
+    def moveEast(self)->bool:
+       
+           if self.position.getY() < self.taquin.getSize() - 1 :
+                droite=self.taquin.getCase(self.position.getX(), self.position.getY() + 1)
+                droite.setPositionY(self.position.getY())
+                self.position.setY(self.position.getY() + 1)
+                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
+                self.taquin.setCase(droite.getPositionX(), droite.getPositionY(), droite)
+                return True
+           else:
+                return False
+    def moveWest(self)->bool:
+        
+            if self.position.getY() > 0 :
+               
+                gauche=self.taquin.getCase(self.position.getX(), self.position.getY() - 1)
+                gauche.setPositionY(self.position.getY())
+                self.position.setY(self.position.getY() - 1)
+                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
+                self.taquin.setCase(gauche.getPositionX(), gauche.getPositionY(), gauche)
+                return True
+            else:
+                return False
 
 
     def __eq__(self, __o: object) -> bool:
@@ -113,20 +118,20 @@ class Case(CaseVide):
     def setValue(self, value) :
         self.value = value
 
-    def moveNorth(self, direction)->bool:
-        if direction == "N" :
+    def moveNorth(self)->bool:
+         print("case")
          return False
-    def moveSouth(self, direction)->bool:
-        if direction == "S" :
+    def moveSouth(self)->bool:
+         print("case")
          return False
-    def moveEast(self, direction)->bool:
-        if direction == "E" :
+    def moveEast(self)->bool:
+         print("case")
          return False
-    def moveWest(self, direction)->bool:
-        if direction == "W" :
+    def moveWest(self)->bool:
+         print("case")
          return False
-    def clone(self):
-        return Case(self.value, self.position.clone(), self.taquin)
+    def clone(self,taq):
+        return Case(self.value, self.position.clone(), taq)
     def __eq__(self, __o: object) -> bool:
         return super().__eq__(__o)
 
@@ -140,13 +145,13 @@ class listePriorite:
         self.liste = []
         self.taquinFinal=taquinFinal
         self.poids=poids
-    def insert(self, element,comparator):
+    def insertTaquin(self, element:'Taquin'):
         if len(self.liste) == 0:
             self.liste.append(element)
         else:
             for i in range(len(self.liste)):
                
-                if comparator(self.liste[i],self.taquinFinal,self.poids)<0:#element.comparator() - self.liste[i].comparator()<0
+                if element.compareTo(self.liste[i],self.taquinFinal,self.poids)<0:#element.comparator() - self.liste[i].comparator()<0
                     self.liste.insert(i, element)
                     break
                 elif i == len(self.liste) - 1:
@@ -156,6 +161,8 @@ class listePriorite:
         return self.liste.pop(0)
     def isEmpty(self):
         return len(self.liste) == 0
+    def remove(self,element):
+        self.liste.remove(element)
 
 
     
@@ -170,17 +177,18 @@ class Taquin:
         
         self.size = size
         self.parent = parent
-        self.cases = []
+        self.cases = list()
+       
 
     def remplir(self):
         z=0
         for i in range(self.size):
-            self.cases.append([])
+            self.cases.append(list())
             for j in range(self.size):
                 if(j==self.size-1 and i==self.size-1):
                     self.caseVide=CaseVide(Position(i, j), self)
                     self.cases[i].append(self.caseVide)
-                    z+=1
+                    
                     break
                 self.cases[i].append(Case(z,Position(i, j), self))
                 z+=1
@@ -191,8 +199,8 @@ class Taquin:
         for i in range(self.size):
             taquin.cases.append([])
             for j in range(self.size):
-                C=self.cases[i][j].clone()
-                taquin.cases[i].append(C)
+                cc=self.cases[i][j].clone(taquin)
+                taquin.cases[i].append(cc)
                 if taquin.cases[i][j].getValue() == None:
                     taquin.caseVide = taquin.cases[i][j]
         return taquin
@@ -210,7 +218,8 @@ class Taquin:
                     return self.cases[i][j]
                 
     def setCase(self, x, y, case) :
-        self.cases[x][y] = case
+        self.cases[x].remove(self.cases[x][y])
+        self.cases[x].insert(y, case)
     def getCaseVide(self) :
         return self.caseVide
     def getParent(self) :
@@ -223,22 +232,22 @@ class Taquin:
         return self.parent.cout()+1#fonction g
     
     def move(self, direction) :
-        moved=self.clone()
+        moved:Taquin=self.clone()
         
         if (direction == "N"):
-            if moved.caseVide.moveNorth(direction):
+            if moved.getCaseVide().moveNorth():
                 moved.setParent(self)
                 return moved
         if (direction == "S"):
-            if moved.caseVide.moveSouth(direction):
+            if moved.caseVide.moveSouth():
                 moved.setParent(self)
                 return moved
         if (direction == "E"):
-            if moved.caseVide.moveEast(direction):
+            if moved.caseVide.moveEast():
                 moved.setParent(self)
                 return moved
         if (direction == "W"):
-            if moved.caseVide.moveWest(direction):
+            if moved.caseVide.moveWest():
                 moved.setParent(self)
                 return moved
             
@@ -263,6 +272,14 @@ class Taquin:
             res += "\n"
 
         return res
+    def aff(self) :
+        res = ""
+        for i in range(self.size):
+            for j in range(self.size):
+                res += str(self.getCase(i,j).getValue()) + " "
+            res += "\n"
+
+        return res
     
     
     
@@ -278,7 +295,18 @@ class Taquin:
    
     def shuffle(self, nbMoves:int):
         for i in range(nbMoves):
-            self.move(random.choice(["N", "S", "E", "W"]))
+            dir=random.choice(["N", "S", "E", "W"])
+            if (dir == "N"):
+                 self.getCaseVide().moveNorth()
+            if (dir == "S"):
+                    self.getCaseVide().moveSouth()
+            if (dir == "E"):
+                    self.getCaseVide().moveEast()
+            if (dir == "W"):
+                    self.getCaseVide().moveWest()
+               
+            
+
 
     def heuristiquePondere(self,taquinFinal:'Taquin',poids:list()):
         res=0
@@ -290,57 +318,55 @@ class Taquin:
     def fnctEval(self,taquinFinal:'Taquin',poids:list()):
         return self.heuristiquePondere(taquinFinal,poids)+self.cout()
 
-    def getVoisins(self,taquinFinal:'Taquin',poids:list()):
-        voisins:list(Taquin)
-        voisins=[]
-        for direction in ["N", "S", "E", "W"]:
-            if self.move(direction):
-                voisins.append((self.clone(),self.fnctEval(taquinFinal,poids)))
-                self.move(self.getOppositeDirection(direction))
-        return voisins
-    def getOppositeDirection(self,direction):
-        if direction == "N":
-            return "S"
-        elif direction == "S":
-            return "N"
-        elif direction == "E":
-            return "W"
-        elif direction == "W":
-            return "E"
-        return None
    
     def compareTo(self, taquin:'Taquin',taquinFinal:'Taquin',poids:list()) :
         return self.fnctEval(taquinFinal,poids) - taquin.fnctEval(taquinFinal,poids)
+    
+    
     def solve(self, taquinFinal:'Taquin',poids:list()) :
         openList = listePriorite(taquinFinal,poids)
-        closedList:list(Taquin) = []
-        openList.insert(self, self.fnctEval(taquinFinal,poids))
+        closedList = listePriorite(taquinFinal,poids)
+        openList.insertTaquin(self)
         while not openList.isEmpty():
-            print("ll")
+           
             current:Taquin = openList.pop()
+           
             if current.isSolved(taquinFinal):
                 return current
             
             for direction in ["N", "S", "E", "W"]:
-                v=current.move(direction)
-                b=True
-                for c in closedList:
-                    b=b and v.eg(c)
-                if b:
-                        openList.insert(v,v.compareTo)
-                        print(v.cout())
-            closedList.append(current)
+                
+               v:Taquin = current.move(direction)
+               if v!=None:
+                print(v.aff())
+                
+                stop=False
+                for c in closedList.liste:
+                    if  v.eg(c):#si le taquin est deja dans la liste fermée
+                        stop=True
+                if not stop:    #si le taquin n'est pas dans la liste fermée
+                        notdoubleM=True
+                        for c in openList.liste:#
+                            if  v.eg(c) and v.cout()>=c.cout():#
+                                notdoubleM=False
+                            if  v.eg(c) and v.cout()<c.cout():
+                                openList.remove(c)
+                       
+                        if notdoubleM:#
+                                openList.insertTaquin(v)
+                           
+            closedList.insertTaquin(current)
         return None
     
     
 
-    def eg(self, __o: 'Taquin') -> bool:
+    def eg(self, t: 'Taquin') -> bool:
         
-            if self.size==__o.size:
+            if self.size==t.size:
                 
                 for i in range (self.size):
                     for j in range (self.size):
-                        if not self.getCase(i,j).getValue()==__o.getCase(i,j).getValue():
+                        if  self.getCase(i,j).getValue()!=t.getCase(i,j).getValue():
                             return False
                 
                 return True
