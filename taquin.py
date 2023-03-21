@@ -52,13 +52,15 @@ class CaseVide:
         pass
     def clone(self,taq):
         return CaseVide(self.position, taq)
-    def moveNorth(self)->bool:
+    def moveNorth(self)->bool:#avec setCaseInsert et getCaseRmove
             if self.position.getX() > 0 :
-                descendre=self.taquin.getCase(self.position.getX() - 1, self.position.getY())
+                descendre=self.taquin.getCaseRemove(self.position.getX() - 1, self.position.getY())
+                casevide=self.taquin.getCaseRemove(self.position.getX(), self.position.getY())
                 descendre.setPositionX(self.position.getX())
                 self.position.setX(self.position.getX() - 1)
-                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
-                self.taquin.setCase(descendre.getPositionX(), descendre.getPositionY(), descendre)
+                
+                self.taquin.setCaseInsert(descendre.getPositionX(), descendre.getPositionY(), descendre)
+                self.taquin.setCaseInsert(casevide.position.getX(), casevide.position.getY(), self)
                 return True
             else:
                 return False
@@ -67,11 +69,13 @@ class CaseVide:
            
             
               if self.position.getX() < self.taquin.getSize() - 1 :
-                monter=self.taquin.getCase(self.position.getX() + 1, self.position.getY())
+                monter=self.taquin.getCaseRemove(self.position.getX() + 1, self.position.getY())
+                casevide=self.taquin.getCaseRemove(self.position.getX(), self.position.getY())
                 monter.setPositionX(self.position.getX())
                 self.position.setX(self.position.getX() + 1)
-                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
-                self.taquin.setCase(monter.getPositionX(), monter.getPositionY(), monter)
+                
+                self.taquin.setCaseInsert(monter.getPositionX(), monter.getPositionY(), monter)
+                self.taquin.setCaseInsert(casevide.position.getX(), casevide.position.getY(), self)
                 return True
               else:
                 return False
@@ -81,8 +85,9 @@ class CaseVide:
                 droite=self.taquin.getCase(self.position.getX(), self.position.getY() + 1)
                 droite.setPositionY(self.position.getY())
                 self.position.setY(self.position.getY() + 1)
-                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
+               
                 self.taquin.setCase(droite.getPositionX(), droite.getPositionY(), droite)
+                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
                 return True
            else:
                 return False
@@ -93,16 +98,15 @@ class CaseVide:
                 gauche=self.taquin.getCase(self.position.getX(), self.position.getY() - 1)
                 gauche.setPositionY(self.position.getY())
                 self.position.setY(self.position.getY() - 1)
-                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
+                
                 self.taquin.setCase(gauche.getPositionX(), gauche.getPositionY(), gauche)
+                self.taquin.setCase(self.position.getX(), self.position.getY(), self)
                 return True
             else:
                 return False
 
 
-    def __eq__(self, __o: object) -> bool:
-        return self.position.__eq__(__o.position)and self.value.__eq__(__o.value)
-
+    
 
 class Case(CaseVide):
     
@@ -189,9 +193,9 @@ class Taquin:
                     self.caseVide=CaseVide(Position(i, j), self)
                     self.cases[i].append(self.caseVide)
                     
-                    break
-                self.cases[i].append(Case(z,Position(i, j), self))
-                z+=1
+                else:
+                    self.cases[i].append(Case(z,Position(i, j), self))
+                    z+=1
    
     def clone(self ):
         taquin=Taquin(self.size,self.parent)
@@ -201,14 +205,22 @@ class Taquin:
             for j in range(self.size):
                 cc=self.cases[i][j].clone(taquin)
                 taquin.cases[i].append(cc)
-                if taquin.cases[i][j].getValue() == None:
-                    taquin.caseVide = taquin.cases[i][j]
+        c=0
+        for i in range(self.size):
+            for j in range(self.size):
+                if taquin.cases[i][j].getValue()==None:
+                    taquin.caseVide=taquin.cases[i][j]
+                    c+=1
+        if c!=1:
+            print("erreur")
+                
         return taquin
         
 
     def getSize(self) :
         return self.size
-    
+    def getCaseRemove(self, x, y) :
+        return self.cases[x].pop(y)
     def getCase(self, x, y) :
         return self.cases[x][y]
     def getCasebV(self,val):
@@ -218,7 +230,8 @@ class Taquin:
                     return self.cases[i][j]
                 
     def setCase(self, x, y, case) :
-        self.cases[x].remove(self.cases[x][y])
+        self.cases[x][y] = case
+    def setCaseInsert(self, x, y, case) :
         self.cases[x].insert(y, case)
     def getCaseVide(self) :
         return self.caseVide
@@ -233,26 +246,84 @@ class Taquin:
     
     def move(self, direction) :
         moved:Taquin=self.clone()
+        moved.setParent(self)
         
         if (direction == "N"):
-            if moved.getCaseVide().moveNorth():
-                moved.setParent(self)
-                return moved
+             moved.getCaseVide().moveNorth()
+                       
         if (direction == "S"):
-            if moved.caseVide.moveSouth():
-                moved.setParent(self)
+             moved.caseVide.moveSouth()
+                
+                
+        if (direction == "E"):
+             moved.caseVide.moveEast()
+               
+                
+        if (direction == "W"):
+             moved.caseVide.moveWest()
+              
+        return moved
+            
+       
+
+#fonction permut (case1,case2 )pour permuter 2 cases d'une matrice
+    def movebyPermut(self,direction):
+
+        moved:Taquin=self.clone()
+        moved.setParent(self)
+        if (direction == "N"):
+          if self.caseVide.position.getX() > 0 :
+            x=moved.caseVide.getPositionX()
+            y=moved.caseVide.getPositionY()
+            x2=x-1
+            y2=y
+            moved.cases[x][y]=moved.cases[x2][y2]
+            moved.cases[x2][y2]=moved.caseVide
+            moved.caseVide.setPositionX(x2)
+            moved.caseVide.setPositionY(y2)
+            moved.cases[x][y].setPositionX(x)
+            moved.cases[x][y].setPositionY(y)
+            return moved
+        if (direction == "S"):
+            if self.caseVide.position.getX() < self.size-1 :
+                x=moved.caseVide.getPositionX()
+                y=moved.caseVide.getPositionY()
+                x2=x+1
+                y2=y
+                moved.cases[x][y]=moved.cases[x2][y2]
+                moved.cases[x2][y2]=moved.caseVide
+                moved.caseVide.setPositionX(x2)
+                moved.caseVide.setPositionY(y2)
+                moved.cases[x][y].setPositionX(x)
+                moved.cases[x][y].setPositionY(y)
                 return moved
         if (direction == "E"):
-            if moved.caseVide.moveEast():
-                moved.setParent(self)
+            if self.caseVide.position.getY() < self.size-1 :
+                x=moved.caseVide.getPositionX()
+                y=moved.caseVide.getPositionY()
+                x2=x
+                y2=y+1
+                moved.cases[x][y]=moved.cases[x2][y2]
+                moved.cases[x2][y2]=moved.caseVide
+                moved.caseVide.setPositionX(x2)
+                moved.caseVide.setPositionY(y2)
+                moved.cases[x][y].setPositionX(x)
+                moved.cases[x][y].setPositionY(y)
                 return moved
         if (direction == "W"):
-            if moved.caseVide.moveWest():
-                moved.setParent(self)
+            if self.caseVide.position.getY() > 0 :
+                x=moved.caseVide.getPositionX()
+                y=moved.caseVide.getPositionY()
+                x2=x
+                y2=y-1
+                moved.cases[x][y]=moved.cases[x2][y2]
+                moved.cases[x2][y2]=moved.caseVide
+                moved.caseVide.setPositionX(x2)
+                moved.caseVide.setPositionY(y2)
+                moved.cases[x][y].setPositionX(x)
+                moved.cases[x][y].setPositionY(y)
                 return moved
-            
-        return None
-
+        return moved
 
 
       
@@ -271,16 +342,9 @@ class Taquin:
                 res += str(self.cases[i][j].getValue()) + " "
             res += "\n"
 
+        res+="\n x"+str(self.caseVide.getPositionX())+" y"+str(self.caseVide.getPositionY())+"\n"
         return res
-    def aff(self) :
-        res = ""
-        for i in range(self.size):
-            for j in range(self.size):
-                res += str(self.getCase(i,j).getValue()) + " "
-            res += "\n"
-
-        return res
-    
+   
     
     
     def distmanhattan(self, taquinFinal:'Taquin',i:int,j:int) :
@@ -291,19 +355,22 @@ class Taquin:
                     return abs(c.getPositionX()- cFinal.getPositionX()) + abs(c.getPositionY() - cFinal.getPositionY())
         return 0#A revoir pour la case vide
    
-   
+    def oppositeDirection(self, direction):
+        if direction == "N":
+            return "S"
+        if direction == "S":
+            return "N"
+        if direction == "E":
+            return "W"
+        if direction == "W":
+            return "E"
+        
    
     def shuffle(self, nbMoves:int):
         for i in range(nbMoves):
+            print(self.__str__() + "\n")
             dir=random.choice(["N", "S", "E", "W"])
-            if (dir == "N"):
-                 self.getCaseVide().moveNorth()
-            if (dir == "S"):
-                    self.getCaseVide().moveSouth()
-            if (dir == "E"):
-                    self.getCaseVide().moveEast()
-            if (dir == "W"):
-                    self.getCaseVide().moveWest()
+            self=self.movebyPermut(dir)
                
             
 
@@ -334,11 +401,13 @@ class Taquin:
             if current.isSolved(taquinFinal):
                 return current
             
-            for direction in ["N", "S", "E", "W"]:
-                
-               v:Taquin = current.move(direction)
+            for dir in ["N", "S", "E", "W"]:
+               v:Taquin = current.movebyPermut(dir)
+               
+               
+               
                if v!=None:
-                print(v.aff())
+                print(v.__str__())
                 
                 stop=False
                 for c in closedList.liste:

@@ -6,7 +6,7 @@ taquin = Taquin(3,None)
 taquin.remplir()
 taquinFinal = taquin.clone()
 
-taquin.shuffle(5)
+taquin.shuffle(100)
 print('Testing')
 print(taquin.__str__())
 print("-----------------------------------------")
