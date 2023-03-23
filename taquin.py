@@ -1,3 +1,4 @@
+import math
 import random
 from time import sleep
 
@@ -151,13 +152,16 @@ class Taquin:
         liste=self.TaquinToList()
         listeResult=taquinFinal.TaquinToList()
         inversions = 0
-        for i in range(len(liste)):
-            v=liste[i]
-            b=i==listeResult.index(v) 
-            if not b:
+        for i in range(1,self.size*self.size):
+            value=i
+            
+            if not liste.index(value)==listeResult.index(value) :
                 inversions += 1
-                liste[i]=liste[listeResult.index(v) ]
-                liste[listeResult.index(v)]=v   
+                j=liste.index(value)
+                value2=liste[listeResult.index(value)]   
+                liste[listeResult.index(value)]=value
+                liste[j]=value2
+
         return inversions % 2 == self.distmanhattan(taquinFinal,self.caseVide.getPositionX(),self.caseVide.getPositionY()) % 2               
                 
     def clone(self ):
@@ -304,13 +308,27 @@ class Taquin:
            
             dir=random.choice(["N", "S", "E", "W"])
             self.movebyPermut(dir)
-                
+    def disYoucef(self,taquinFinal:'Taquin',i:int,j:int):
+        c :CaseVide=self.cases[i][j]
+        cFinal=taquinFinal.getCasebV(c.getValue())
+        ab=abs(c.getPositionX()- cFinal.getPositionX())
+        ac=abs(c.getPositionY() - cFinal.getPositionY())
+        bc=math.sqrt(ab*ab+ac*ac)
+        return bc  
+
+    def uneHeuristique(self,taquinFinal:'Taquin'):
+        res=0
+        for i in range(self.size):
+            for j in range(self.size):
+                if(self.cases[i][j].getValue() != None):
+                 res+=self.disYoucef(taquinFinal,i,j)
+        return res    
     def heuristiquePondere(self,taquinFinal:'Taquin',poids:list()):
         res=0
         for i in range(self.size):
             for j in range(self.size):
                 if(self.cases[i][j].getValue() != None):
-                 res+=self.distmanhattan(taquinFinal,i,j)*poids[self.cases[i][j].getValue()]
+                 res+=self.disYoucef(taquinFinal,i,j)*poids[self.cases[i][j].getValue()]
         return res
     def fnctEval(self,taquinFinal:'Taquin',poids:list()):
         return self.heuristiquePondere(taquinFinal,poids)+self.cout()
