@@ -25,12 +25,11 @@ class Position :
 
 class CaseVide:
     Position:Position
-    taquin:"Taquin"
-   
-    def __init__(self, position, taquin) :
+
+    value:int
+    def __init__(self, position) :
         self.position = position
-        self.taquin = taquin
-     
+        self.value =None
 
 
     def getPositionX(self) :
@@ -42,11 +41,13 @@ class CaseVide:
         return self.position.getY()
     def setPositionY(self, positionY) :
         self.position.setY(positionY)
+
+
     def getValue(self) :
         return None
-
-    def clone(self,taq):
-        return CaseVide(self.position.clone(), taq)
+   
+    def clone(self):
+        return CaseVide(self.position.clone())
     def moveNorth(self)->bool:#avec setCaseInsert et getCaseRmove
             if self.position.getX() > 0 :
                 descendre=self.taquin.getCaseRemove(self.position.getX() - 1, self.position.getY())
@@ -105,12 +106,12 @@ class CaseVide:
 
 class Case(CaseVide):
     
-    value:int
+    
    
-    def __init__(self, value, position, taquin) :
+    def __init__(self, value, position) :
         self.value = value
         self.position = position
-        self.taquin = taquin
+
 
     def getValue(self) :
         return self.value
@@ -129,10 +130,10 @@ class Case(CaseVide):
     def moveWest(self)->bool:
          print("case")
          return False
-    def clone(self,taq):
-        return Case(self.value, self.position.clone(), taq)
+    def clone(self):
+        return Case(self.value, self.position.clone())
     def __eq__(self, __o: object) -> bool:
-        return super().__eq__(__o) and self.value==__o.value
+        return super().__eq__(__o)
 
 
 
@@ -185,11 +186,11 @@ class Taquin:
             self.cases.append(list())
             for j in range(self.size):
                 if(j==self.size-1 and i==self.size-1):
-                    self.caseVide=CaseVide(Position(i, j), self)
+                    self.caseVide=CaseVide(Position(i, j))
                     self.cases[i].append(self.caseVide)
                     
                 else:
-                    self.cases[i].append(Case(z,Position(i, j), self))
+                    self.cases[i].append(Case(z,Position(i, j)))
                     z+=1
    
     def clone(self ):
@@ -198,7 +199,7 @@ class Taquin:
         for i in range(self.size):
             taquin.cases.append([])
             for j in range(self.size):
-                cc=self.cases[i][j].clone(taquin)
+                cc=self.cases[i][j].clone()
                 taquin.cases[i].append(cc)
         c=0
         for i in range(self.size):
@@ -217,18 +218,17 @@ class Taquin:
 
     def getCase(self, x, y) :
         return self.cases[x][y]
-
+    def getCasebV(self,val):
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.cases[i][j].getValue() == val:
+                    return self.cases[i][j]
                 
     def setCase(self, x, y, case) :
         self.cases[x][y] = case
 
     def getCaseVide(self) :
         return self.caseVide
-    def getCasebV(self,value):
-        for i in range(self.size):
-            for j in range(self.size):
-                if self.cases[i][j].getValue()==value:
-                    return self.cases[i][j]
 
     def cout(self):
         if self.parent == None:
@@ -237,7 +237,6 @@ class Taquin:
     
     def move(self, direction) :
         moved:Taquin=self.clone()
-        moved.setParent(self)
         moved.movebyPermut(direction)
             
        
@@ -317,10 +316,10 @@ class Taquin:
         res = ""
         for i in range(self.size):
             for j in range(self.size):
-                res += str(self.cases[i][j].getValue()) + '(' +str(i)+","+str(j)+')'+" |"
+                res += str(self.cases[i][j].getValue()) +" |"
             res += "\n------------------------------------\n"
 
-        res+="\n cout "+str(self.cout())+"\n"
+        res+="\n \t\t\cout  "+str(self.cout())+"\n"
         return res
    
     
@@ -333,16 +332,7 @@ class Taquin:
                     return abs(c.getPositionX()- cFinal.getPositionX()) + abs(c.getPositionY() - cFinal.getPositionY())
         return 0#A revoir pour la case vide
    
-    def oppositeDirection(self, direction):
-        if direction == "N":
-            return "S"
-        if direction == "S":
-            return "N"
-        if direction == "E":
-            return "W"
-        if direction == "W":
-            return "E"
-        
+
    
     def shuffle(self, nbMoves:int):
         for i in range(nbMoves):
@@ -372,23 +362,25 @@ class Taquin:
     
     def solve(self, taquinFinal:'Taquin',poids:list()) :
         openList = listePriorite(taquinFinal,poids)
-        closedList = listePriorite(taquinFinal,poids)
+        closedList = []
         openList.insertTaquin(self)
         while not openList.isEmpty():
            
             current:Taquin = openList.pop()
            
             if current.isSolved(taquinFinal):
+                print("\t\tnombre de taquin parcouru : ",len(closedList))
                 return current
             
-            for dir in ["N", "S", "E", "W"]:               
-               if current.movebyPermut(dir):#si le taquin est bien déplacé
-                v=current.clone()
-                current.movebyPermut(current.oppositeDirection(dir))
-                print(v.__str__())
-                
+            for dir in ["N", "S", "E", "W"]:
+           
+               
+               v=current.clone()
+               
+               if v.movebyPermut(dir):#si le taquin est bien déplacé
+               
                 stop=False
-                for c in closedList.liste:
+                for c in closedList:
                     if  v.eg(c):#si le taquin est deja dans la liste fermée
                         stop=True
                 if not stop:    #si le taquin n'est pas dans la liste fermée
@@ -402,14 +394,14 @@ class Taquin:
                         if notdoubleM:#
                                 openList.insertTaquin(v)
                            
-            closedList.insertTaquin(current)
+            closedList.append(current)
         return None
     
     
 
-    def eg(self, t: 'Taquin') -> bool:
-        
-            return (self.size==t.size and self.isSolved(t))
+    def eg(self, t) -> bool:
+
+            return  self.size==t.size and self.isSolved(t)
 
 
 

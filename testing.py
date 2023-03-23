@@ -1,17 +1,17 @@
 import random
-from time import sleep
+
 
 
 class Case:
-    taquin:"Taquin"
+
     value:int
     x:int
     y:int
-    def __init__(self, x,y,value, taquin) :
-        self.x = x
-        self.y = y
+    def __init__(self, x,y,value) :
+        self.x = int(x)
+        self.y = int(y)
         self.value = value
-        self.taquin = taquin
+   
         
 
 
@@ -29,8 +29,8 @@ class Case:
         return self.value
 
    
-    def clone(self,taq):
-        return Case(self.x,self.y,self.value ,taq)
+    def clone(self):
+        return Case(self.x,self.y,self.value)
     def __eq__(self, __o: object) -> bool:
         return super().__eq__(__o)
 
@@ -51,10 +51,10 @@ class Taquin:
             self.cases.append(list())
             for j in range(self.size):
                 if(z==self.size*self.size):
-                    self.cases[i].append(Case(i, j,None, self))
+                    self.cases[i].append(Case(i, j,None))
                     
                 else:
-                    self.cases[i].append(Case(i, j, z,self))
+                    self.cases[i].append(Case(i, j, z))
                     z+=1
    
     def clone(self ):
@@ -62,7 +62,7 @@ class Taquin:
         for i in range(self.size):
             taquin.cases.append([])
             for j in range(self.size):
-                cc=self.cases[i][j].clone(taquin)
+                cc=self.cases[i][j].clone()
                 taquin.cases[i].append(cc)         
         return taquin
         
