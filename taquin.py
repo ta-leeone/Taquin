@@ -299,7 +299,7 @@ class Taquin:
         
         cFinal=taquinFinal.getCasebV(c.getValue())
         return abs(c.getPositionX()- cFinal.getPositionX()) + abs(c.getPositionY() - cFinal.getPositionY())
-        #A revoir pour la case vide
+        
    
 
    
@@ -311,23 +311,20 @@ class Taquin:
     def disYoucef(self,taquinFinal:'Taquin',i:int,j:int):
         c :CaseVide=self.cases[i][j]
         cFinal=taquinFinal.getCasebV(c.getValue())
-        ab=abs(c.getPositionX()- cFinal.getPositionX())
-        ac=abs(c.getPositionY() - cFinal.getPositionY())
-        bc=math.sqrt(ab*ab+ac*ac)
-        return bc  
 
-    def uneHeuristique(self,taquinFinal:'Taquin'):
-        res=0
-        for i in range(self.size):
-            for j in range(self.size):
-                if(self.cases[i][j].getValue() != None):
-                 res+=self.disYoucef(taquinFinal,i,j)
-        return res    
+        dism= 3*(abs(c.getPositionX()- cFinal.getPositionX()) + abs(c.getPositionY() - cFinal.getPositionY())) 
+        cFinal=taquinFinal.getCasebV(None)
+        disANone= abs(c.getPositionX()- cFinal.getPositionX()) + abs(c.getPositionY() - cFinal.getPositionY())
+        if disANone==0:
+            return dism-2
+        return dism+disANone
+
+  
     def heuristiquePondere(self,taquinFinal:'Taquin',poids:list()):
         res=0
         for i in range(self.size):
             for j in range(self.size):
-                if(self.cases[i][j].getValue() != None):
+                if(self.cases[i][j].getValue() != None):#case vide non prise en compte 
                  res+=self.disYoucef(taquinFinal,i,j)*poids[self.cases[i][j].getValue()]
         return res
     def fnctEval(self,taquinFinal:'Taquin',poids:list()):
