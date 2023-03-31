@@ -1,61 +1,86 @@
-import datetime
+
 from taquin import *
 import time
+import sys
+import os
 
 
+#lecture des arguments de la ligne de commande -Ui pour user init
+#  -Si pour shuffle -n pour la taille du taquin -p pour les poids
+#-s 20 -n 3 -p 1,1,1,1,1,1,1,1,1,1,1,1,1
+
+
+# initialiser avec une liste 
+listInit=[]
+boolInit=False
+shuffleNumber = 0
+n = 3
+poids = []
+if len(sys.argv) == 1:
+        print("Aucun argument")
+        exit(1)
+else:
+        
+        for i in range(1,len(sys.argv)):
+                if sys.argv[i] == "-Si":
+                        shuffleNumber = int(sys.argv[i+1])
+                elif sys.argv[i] == "-n":
+                        n = int(sys.argv[i+1])
+                elif sys.argv[i] == "-p":
+                        temp = sys.argv[i+1].split(",")
+                        poids=[]
+                        print(temp)
+                        for i in range(len(temp)):
+                                poids.append(int(temp[i]))
+                elif sys.argv[i] == "-Ui":
+                        boolInit=True
+                        temp = sys.argv[i+1].split(",")
+                        listInit=[]
+                        for i in range(len(temp)):
+                                listInit.append(int(temp[i]))
+
+
+
+
+
+if len(poids) == 0:
+        for i in range(n*n):
+                poids.append(1)
     # resolution d'un taquin 3*3
-taquin = Taquin(3,None)
+taquin :Taquin= Taquin(n,None)
 taquin.remplir()
 taquinFinal = taquin.clone()
-#taquin.remplirWithList([5 ,2 ,3  ,4 ,1 ,6 ,7 ,8,None])
 
-taquin.shuffle(50)
-#definition d'un array 6*9
-poids =         [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                 [800,400,400,
-                  400,300,300,
-                  400,300,200,
-                  220,
-                  400,220,199,129,109,
-                  300,180,99,55,55,
-                  220,120,99,45,0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0],
-                 [8,7,6,5,3,2,4,1,0,2,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0],
-                 [8,7,6,5,4,3,2,1,0,3,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0],
-                 [8,7,6,5,4,3,2,1,0,4,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0],
-                 [36,12,12,4,1,1,4,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0]    
-                 ]
+if boolInit:
+        taquin.remplirWithList(listInit)
+else:
+        taquin.shuffle(shuffleNumber)
 
-
-
+print("Taquin initial")
 print(taquin.__str__() )
-# print if solvable
-if taquin.isSolvable(taquinFinal):
-        print("Taquin solvable")
-else:
-        print("Taquin non solvable")
-        exit()
-      
+print('-----------------------------\n')
+print("Taquin final")
+print(taquinFinal.__str__())
 
-if (taquin.isSolved(taquinFinal) ):
+
+
+print("\n\n\t\t\t\t\tDebut resolutions ")
+
+# for p in poids:
+
+temps=time.time()
+taquinsol:Taquin=taquin.solve(taquinFinal,poids)
+time2 = time.time()
+print(taquinsol.__str__())
+print(" \t\t Temps de resolution : ",1000*(time2-temps),"\n\t\tNombre de coup ",taquinsol.cout())
+print("-----------------------------\n")
+
+if taquinsol.isSolved(taquinFinal):
         print("Taquin resolu")
-else:
-        print("\t\t\t\tDebut resolutions ")
-        taquinsol:Taquin=taquin.clone()
-        for p in poids:
-                        print("\t\tEssaye de la strategie ",poids.index(p))
-                        temps=time.time()
-                        taquinsol:Taquin=taquin.solve(taquinFinal,p)
-                        time2 = time.time()
-                        print(taquinsol.__str__())
-                        print(" \t\tTemps de resolution : ",1000*(time2-temps),"\n\t\tNombre de coup ",taquinsol.cout())
-                        print("-----------------------------\n")
         
-        if taquinsol.isSolved(taquinFinal):
-                print("Taquin resolu")
-                
-               
-        else:
-                print("Taquin non resolu")
+        
+else:
+        print("Taquin non resolu")
 
 
 

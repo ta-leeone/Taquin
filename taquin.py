@@ -336,41 +336,44 @@ class Taquin:
     
     
     def solve(self, taquinFinal:'Taquin',poids:list()) :
-        openList = listePriorite(taquinFinal,poids)
-        closedList = []
-        openList.insertTaquin(self)
-        while not openList.isEmpty():
-           
-            current:Taquin = openList.pop()
-           
-            if current.isSolved(taquinFinal):
-                print("\t\tnombre de taquin parcouru : ",len(closedList))
-                return current
+        if self.isSolvable(taquinFinal):
+            openList = listePriorite(taquinFinal,poids)
+            closedList = []
+            openList.insertTaquin(self)
+            while not openList.isEmpty():
             
-            for dir in ["N", "S", "E", "W"]:
-           
-               
-               v=current.clone()
-               
-               if v.movebyPermut(dir):#si le taquin est bien déplacé
-               
-                stop=False
-                for c in closedList:
-                    if  v.eg(c):#si le taquin est deja dans la liste fermée
-                        stop=True
-                if not stop:    #si le taquin n'est pas dans la liste fermée
-                        notdoubleM=True
-                        for c in openList.liste:#
-                            if  v.eg(c) and v.cout()>=c.cout():#
-                                notdoubleM=False
-                            if  v.eg(c) and v.cout()<c.cout():
-                                openList.remove(c)
-                       
-                        if notdoubleM:#
-                                openList.insertTaquin(v)
-                           
-            closedList.append(current)
-        return None
+                    current:Taquin = openList.pop()
+            
+                    if current.isSolved(taquinFinal):
+                        print("\t\tnombre de taquin parcouru : ",len(closedList))
+                        return current
+                    
+                    for dir in ["N", "S", "E", "W"]:
+                    
+                        
+                            v=current.clone()
+                            
+                            if v.movebyPermut(dir):#si le taquin est bien déplacé
+                                
+                                    stop=False
+                                    for c in closedList:
+                                            if  v.eg(c):#si le taquin est deja dans la liste fermée
+                                                stop=True
+                                    if not stop:    #si le taquin n'est pas dans la liste fermée
+                                            notdoubleM=True
+                                            for c in openList.liste:#
+                                                    if  v.eg(c) and v.cout()>=c.cout():#
+                                                        notdoubleM=False
+                                                    if  v.eg(c) and v.cout()<c.cout():
+                                                        openList.remove(c)
+                                        
+                                            if notdoubleM:#
+                                                    openList.insertTaquin(v)
+                                
+                    closedList.append(current)
+        else:
+            print("le taquin n'est pas solvable")
+            return None
     
     
 
