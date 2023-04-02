@@ -2,10 +2,10 @@
 from taquin import *
 import time
 import sys
-import os
 
 
-#lecture des arguments de la ligne de commande -Ui pour user init
+
+#lecture des arguments de la ligne de commande -Ui pour user init -c pour coef 
 #  -Si pour shuffle -n pour la taille du taquin -p pour les poids
 #-s 20 -n 3 -p 1,1,1,1,1,1,1,1,1,1,1,1,1
 
@@ -15,6 +15,7 @@ listInit=[]
 boolInit=False
 shuffleNumber = 0
 n = 3
+coef = 1
 poids = []
 if len(sys.argv) == 1:
         print("Aucun argument")
@@ -38,7 +39,8 @@ else:
                         listInit=[]
                         for i in range(len(temp)):
                                 listInit.append(int(temp[i]))
-
+                elif sys.argv[i] == "-c":
+                        coef = int(sys.argv[i+1])
 
 
 
@@ -69,7 +71,7 @@ print("\n\n\t\t\t\t\tDebut resolutions ")
 # for p in poids:
 
 temps=time.time()
-taquinsol:Taquin=taquin.solve(taquinFinal,poids)
+taquinsol:Taquin=taquin.solve(taquinFinal,poids,coef)
 time2 = time.time()
 print(taquinsol.__str__())
 print("Chemin Suivi : ",taquinsol.cheminSuivi())
