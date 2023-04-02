@@ -72,6 +72,7 @@ temps=time.time()
 taquinsol:Taquin=taquin.solve(taquinFinal,poids)
 time2 = time.time()
 print(taquinsol.__str__())
+print("Chemin Suivi : ",taquinsol.cheminSuivi())
 print(" \t\t Temps de resolution : ",1000*(time2-temps),"\n\t\tNombre de coup ",taquinsol.cout())
 print("-----------------------------\n")
 

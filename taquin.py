@@ -126,6 +126,37 @@ class Taquin:
                 else:
                     self.cases[i].append(Case(z,Position(i, j)))
                     z+=1
+   
+    def __str__(self) :
+            res = ""
+            for i in range(self.size):
+                for j in range(self.size):
+                    res += str(self.cases[i][j].getValue()) +" |"
+                
+                res += "\n"
+                for j in range(self.size):
+                    res += "----"    
+                res += "\n"
+
+            return res   
+    def cheminSuivi(self):
+        chemin=""
+        if self.parent==None:
+            return ""
+        else:
+            #parent present
+            x,y=self.caseVide.getPositionX(),self.caseVide.getPositionY()
+            if self.parent.caseVide.getPositionX()<x:
+                chemin=self.parent.cheminSuivi()+"S"
+            elif self.parent.caseVide.getPositionX()>x:
+                chemin=self.parent.cheminSuivi()+"N"
+            elif self.parent.caseVide.getPositionY()<y:
+                chemin=self.parent.cheminSuivi()+"E"
+            elif self.parent.caseVide.getPositionY()>y:
+                chemin=self.parent.cheminSuivi()+"W"
+            return chemin
+
+
     def remplirWithList(self,liste:list):
         self.cases=list()
         self.parent=None#remplir avec une liste signifie aucun parent 
@@ -278,18 +309,7 @@ class Taquin:
                     return False
         return True
     
-    def __str__(self) :
-        res = ""
-        for i in range(self.size):
-            for j in range(self.size):
-                res += str(self.cases[i][j].getValue()) +" |"
-            
-            res += "\n"
-            for j in range(self.size):
-                res += "----"    
-            res += "\n"
-
-        return res
+   
    
     
     
