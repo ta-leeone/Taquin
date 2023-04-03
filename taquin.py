@@ -275,7 +275,7 @@ class Taquin:
         if self.isSolvable(taquinFinal):
             entier =0
             openList = listePriorite(taquinFinal,poids,coefNormalisation)
-            closedList:ABRt =None
+            closedList:ABRt=None
             openList.insertTaquin(self)
             while not openList.isEmpty():
             
@@ -298,10 +298,11 @@ class Taquin:
                                     if not closedList.contains(v):    #si le taquin n'est pas dans la liste fermée
                                             notdoubleM=True
                                             for c in openList.liste:#
-                                                    if  v.eg(c) and v.cout()>=c.cout():
-                                                        notdoubleM=False
-                                                    if  v.eg(c) and v.cout()<c.cout():
-                                                        openList.remove(c)
+                                                    if  v.eg(c) :
+                                                        if v.cout()>=c.cout():
+                                                            notdoubleM=False
+                                                        if  v.cout()<c.cout():
+                                                            openList.remove(c)
                                         
                                             if notdoubleM:#
                                                     openList.insertTaquin(v)
@@ -310,12 +311,16 @@ class Taquin:
         else:
             print("le taquin n'est pas solvable")
             return None
-    
-    
-
     def eg(self, t) -> bool:
+        
+       return self.size==t.size and self.isSolved(t)
+    
 
-            return  self.size==t.size and self.isSolved(t)
+    def __eq__(self, t) -> bool:
+        if isinstance(t,Taquin):
+            if isinstance(self,Taquin):
+                return self.taquinToInt()==t.taquinToInt()
+        return False
 
 
 
